@@ -1,68 +1,74 @@
-/**
- * 
- */
 package com.strandls.ccaintegrator.controllers;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+
 import com.strandls.ccaintegrator.ApiConstants;
 import com.strandls.ccaintegrator.pojo.UserProfileData;
 import com.strandls.ccaintegrator.services.IntegratorServices;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * 
+ *
  * @author vilay
  *
  */
-@Api("Intergrator Services")
+@Tag(name = "Integrator Services")
 @Path(ApiConstants.V1 + ApiConstants.SERVICES)
 public class IntegratorController {
 
-	@Inject
-	private IntegratorServices services;
+    @Inject
+    private IntegratorServices services;
 
-	@GET
-	@Path(ApiConstants.PING)
-	@Produces(MediaType.TEXT_PLAIN)
+    @GET
+    @Path(ApiConstants.PING)
+    @Produces(MediaType.TEXT_PLAIN)
+    @Operation(summary = "Ping pong", description = "Returns PONG for health check")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(mediaType = MediaType.TEXT_PLAIN, schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "400", description = "Unable to get pong",
+            content = @Content(mediaType = MediaType.TEXT_PLAIN, schema = @Schema(implementation = String.class)))
+    })
+    public Response getPing() {
+        return Response.status(Status.OK).entity("PONG").build();
+    }
 
-	@ApiOperation(value = "ping pong", notes = "returns pong", response = String.class)
-	@ApiResponses(value = { @ApiResponse(code = 400, message = "unable to get pong", response = String.class) })
-
-	public Response getPing() {
-		return Response.status(Status.OK).entity("PONG").build();
-	}
-
-	@GET
-	@Path(ApiConstants.READ + ApiConstants.PROFILE + "/{id}")
-	@Consumes(MediaType.TEXT_PLAIN)
-	@Produces(MediaType.APPLICATION_JSON)
-
-	@ApiOperation(value = "find by user id", notes = "return the user profile data", response = UserProfileData.class)
-	@ApiResponses(value = { @ApiResponse(code = 400, message = "unable to fetch the data", response = String.class) })
-
-	public Response findUserProfileById(@Context HttpServletRequest request, @PathParam("id") String userId) {
-		try {
-
-			UserProfileData result = services.fetchUserProfileById(request, userId);
-			return Response.status(Status.OK).entity(result).build();
-		} catch (Exception e) {
-			return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
-		}
-	}
-
+    @GET
+    @Path(ApiConstants.READ + ApiConstants.PROFILE + "/{id}")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Find by user id", description = "Returns the user profile data")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User profile found",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = UserProfileData.class))),
+        @ApiResponse(responseCode = "400", description = "Unable to fetch the data",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = String.class)))
+    })
+    public Response findUserProfileById(
+            @Context HttpServletRequest request,
+            @Parameter(description = "User identifier") @PathParam("id") String userId) {
+        try {
+            UserProfileData result = services.fetchUserProfileById(request, userId);
+            return Response.status(Status.OK).entity(result).build();
+        } catch (Exception e) {
+            return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
 }

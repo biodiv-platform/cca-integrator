@@ -1,10 +1,10 @@
 /**
- * 
+ *
  */
 package com.strandls.ccaintegrator.services.impl;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.HttpHeaders;
 
 import org.pac4j.core.profile.CommonProfile;
 
@@ -19,7 +19,7 @@ import com.strandls.user.pojo.User;
 import net.minidev.json.JSONArray;
 
 /**
- * 
+ *
  * @author vilay
  *
  */
@@ -33,10 +33,10 @@ public class IntegratorServicesImpl implements IntegratorServices {
 
 		User user = userServiceApi.getUser(userId);
 		UserProfileData userProfile = new UserProfileData(user);
-		
+
 		// There is no user logged in
 		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-		if (header == null || !header.startsWith("Bearer ")) { 
+		if (header == null || !header.startsWith("Bearer ")) {
 			userProfile.setMobileNumber(null);
 			userProfile.setEmail(null);
 			return userProfile;
@@ -49,20 +49,20 @@ public class IntegratorServicesImpl implements IntegratorServices {
 			userProfile.setEmail(null);
 			return userProfile;
 		}
-		
+
 		// Check for admin
 		boolean isProfileAdmin = false;
 		JSONArray roles = (JSONArray) profile.getAttribute("roles");
 		if (roles.contains("ROLE_ADMIN")) {
 			isProfileAdmin = true;
 		}
-		
+
 		// If user profile is not admin and trying to see somebody else profile
 		if(!isProfileAdmin && !profile.getId().equals(userId)) {
 			userProfile.setEmail(null);
 			userProfile.setMobileNumber(null);
 		}
-		
+
 		return userProfile;
 
 	}

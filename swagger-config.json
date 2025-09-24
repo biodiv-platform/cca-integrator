@@ -4,10 +4,10 @@
   "invokerPackage": "com.strandls.ccaintegrator",
   "groupId": "com.strandls.biodiv",
   "artifactId": "cca-integrator-client",
-  "artifactVersion": "1.0.0",
+  "artifactVersion": "0.0.21",
   "fullJavaUtil": true,
   "dateLibrary": "legacy",
-  "library": "jersey2",
+  "library": "jersey3",
   "developerName": "Vilay Kandi",
   "developerEmail": "vilayk@strandls.com",
   "java8": true
